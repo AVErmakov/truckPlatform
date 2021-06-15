@@ -18,6 +18,7 @@ class CreateLoadsTable extends Migration
             $table->bigInteger('weight');
             $table->unsignedBigInteger('from_town_id');
             $table->unsignedBigInteger('to_town_id');
+            $table->bigInteger('price');
 
             $table->foreign('from_town_id')->references('id')->on('towns');
             $table->foreign('to_town_id')->references('id')->on('towns');

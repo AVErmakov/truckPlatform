@@ -2,30 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Contracts\LoadsServiceInterface;
-use App\Models\Node;
-use App\Models\Town;
+use App\Models\Load;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
-class RestController extends Controller
+class SearchController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index(
-        LoadsServiceInterface $loadsService
-    )
+    public function index()
     {
-        $items = Node::paginate(3);
-//        $items = DB::table('nodes')->paginate(3);
-//        $items = 'dcglhjxzgvl';
-//        dd($item);
-//        Node::all('id');
-        return view('roads', compact('items'));
-//        return dd($item);
+        $item = Load::all();
+        return view('roads', ['item'=> $item]);
     }
 
     /**

@@ -18,6 +18,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::resource('roads', Controllers\RestController::class)->names('rest');
+Route::resource('search', Controllers\SearchController::class)->names('search');
 
-Route::resource('rest', Controllers\RestController::class)->names('rest');
+Route::resource('rest', Controllers\RestController::class)->names('roads');

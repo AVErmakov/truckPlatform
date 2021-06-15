@@ -26,8 +26,8 @@ class LoadFactory extends Factory
         echo $amount;
         return [
             'weight' => random_int(1,20),
-            'from_town_id' => 1,
-            'to_town_id' => 2,
+            'from_town_id' => fn() => Town::query()->inRandomOrder()->first()->id,
+            'to_town_id' => fn() => Town::query()->inRandomOrder()->first()->id,
         ];
     }
 }
