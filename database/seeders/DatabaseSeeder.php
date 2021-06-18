@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
     {
         // \App\Models\User::factory(10)->create();
         // Create matrix 10x5 of nodes
+        $this->call(NodeTypeSeeder::class);
         $this->call(NodeSeeder::class);
         $this->call(TownSeeder::class);
         $this->call(RoadTypeSeeder::class);

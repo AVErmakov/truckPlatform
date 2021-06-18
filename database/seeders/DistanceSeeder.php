@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Contracts\LoadsServiceInterface;
+use App\Contracts\UtillsServiceInterface;
 use App\Models\Load;
 use App\Models\Node;
 use App\Models\Town;

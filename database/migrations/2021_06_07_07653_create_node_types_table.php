@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateNodesTable extends Migration
+class CreateNodeTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,9 @@ class CreateNodesTable extends Migration
      */
     public function up()
     {
-        Schema::create('nodes', function (Blueprint $table) {
+        Schema::create('node_types', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('longitude');
-            $table->bigInteger('latitude');
-            $table->unsignedBigInteger('node_type_id');
-
-            $table->foreign('node_type_id')->references('id')->on('node_types');
+            $table->bigInteger('type');
         });
     }
 
@@ -30,6 +26,6 @@ class CreateNodesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('nodes');
+        Schema::dropIfExists('node_types');
     }
 }

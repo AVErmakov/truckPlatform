@@ -4,13 +4,11 @@ namespace App\Entities;
 
 use Illuminate\Support\Collection;
 
-class PathEntity
+class LoadEntity
 {
     public function __construct(
-        // SPISOK DOROG
-        public Collection $roads,
-
-        public int $distance,
+        // SPISOK DOSTUPNYH GRUZOV
+        public Collection $loadsList,
     )
     {
     }
