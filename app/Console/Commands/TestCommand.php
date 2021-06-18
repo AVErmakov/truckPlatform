@@ -43,25 +43,13 @@ class TestCommand extends Command
      * @return int
      */
     public function handle(
-//        Load $load
         LoadsServiceInterface $loadsService
     )
     {
-//        $result = collect();
-//        $n1 = Town::where('id', 1)->first();
-//        $n2 = Town::where('id', 30)->first();
-//        foreach (Load::all() as $item) {
-//            $benefit = $loadsService->findLoads($n1, $n2, $item, 5);
-//            if ($benefit > 0) {
-//                $item->benefit = $benefit;
-//                $result->push($item);
-//            }
-//        }
+
 //        echo '$result = ' . $result->sortByDesc('benefit') . PHP_EOL;
         $result = $loadsService->newLoad();
 echo '$result =' . $result . PHP_EOL;
-//        DB::table('loads')->insert(
-//        $result);
 
         return 0;
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Contracts\LoadsServiceInterface;
 use App\Contracts\UtillsServiceInterface;
 use App\Models\Load;
 use App\Models\Node;
@@ -11,25 +12,28 @@ use Illuminate\Support\Facades\DB;
 
 class DistanceSeeder extends Seeder
 {
+
     /**
      * Run the database seeds.
      *
      * @return void
      */
-    public function run(LoadsServiceInterface $loadsService)
+
+    public
+    function run()
     {
-//        echo '$town_2 = ' . $town_2;
-//        echo '$node_2 = ' . $node_2;
         foreach (Town::all() as $town_1) {
-            $node_1 = Node::where('id', $town_1->node_id)->first();
             foreach (Town::all() as $town_2) {
-                $node_2 = Node::where('id', $town_2->node_id)->first();
+                $point_a = $town_1->id - 1;
+                $point_b = $town_2->id - 1;
+                $result = abs($point_a % 10 - $point_b % 10) +
+                    abs(intdiv($point_a, 10) - intdiv($point_b, 10));
 
                 DB::table('distances')->insert([
-            'distance' => $loadsService->findDistance($node_1, $node_2) * 50,
-            'town_1_id' => $town_1->id,
-            'town_2_id' => $town_2->id,
-        ]);
+                    'distance' => $result * 50,
+                    'town_1_id' => $town_1->id,
+                    'town_2_id' => $town_2->id,
+                ]);
             }
         }
     }

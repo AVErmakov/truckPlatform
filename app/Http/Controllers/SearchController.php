@@ -15,7 +15,7 @@ class SearchController extends Controller
     public function index()
     {
         $item = Load::all();
-        return view('roads', ['item'=> $item]);
+        return view('roads', ['items'=> $item]);
     }
 
     /**

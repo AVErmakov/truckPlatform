@@ -391,13 +391,22 @@
         body {
             font-family: 'Nunito', sans-serif;
         }
+        td {
+            border: #4a5568 solid 1px;
+        }
     </style>
 </head>
 <body class="antialiased">
 <div>
-    @foreach($items as $item)
-        {{ $item }}
-    @endforeach
+    <table>
+        @foreach($items as $item)
+            <tr>
+                <td>
+                    {{ $item}}
+                </td>
+            </tr>
+        @endforeach
+    </table>
 </div>
 </body>
 </html>
