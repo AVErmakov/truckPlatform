@@ -1,0 +1,5 @@
+1. We've got searching form (emulated by createSearchRequest() in LoadsServiceInterface)
+    or a new load in DB (for now newLoad() which generates random load).
+2. Launch the checkLoad(), in which we call findPath() for every part of trip -
+    empty to pick up, usefull and empty to finish point. It returns a cost of trip
+        (if load's weight > allowable than return -1000)

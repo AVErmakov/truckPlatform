@@ -3,14 +3,15 @@
 namespace App\Services;
 
 use App\Contracts\LoadsServiceInterface;
-use App\Entities\LoadEntity;
 use App\Entities\PathEntity;
+use App\Entities\SearchEntity;
 use App\Models\Distance;
 use App\Models\Load;
 use App\Models\Node;
 use App\Models\Offer;
 use App\Models\Town;
 use App\Models\Vehicle;
+use App\Models\VehicleType;
 use Faker\Provider\DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 class LoadsService implements LoadsServiceInterface
 {
 
-    public function findPath(Town $from, Town $to, Load $load): PathEntity
+    public function findPath(Town $from, Town $to): PathEntity
     {
 //        Находим оптимальный маршрут для поездки
 //        Пока это просто расстояние из модели Distance
@@ -26,7 +27,49 @@ class LoadsService implements LoadsServiceInterface
 //        В $load будет тип груза (и в соответствии с ним надо будет выбрать
 //        тип грузовика sortByVehicleType
         // TODO: Implement type of load in Load model
+        $p1 = Node::where('id', $from->node_id)->first();
+        $p2 = Node::where('id', $to->node_id)->first();
+        $utillsService = new UtillsService();
+        $distance = $utillsService->findDistance($p1, $p2);
+        $roads = collect([$p1, $p2]);
+        $pathEntity = new PathEntity($roads, $distance);
+        return $pathEntity;
+    }
 
+    public function createSearchRequest(Town $start,
+                                        Town $finish,
+                                        VehicleType $vehicleType,
+                                        int $weight_able): SearchEntity
+    {
+        return new SearchEntity($start, $finish, $vehicleType, $weight_able);
+    }
+
+    public function checkLoad(SearchEntity $searchEntity, Load $load): int
+    {
+        $start = $searchEntity->start;
+        $finish = $searchEntity->finish;
+
+        $from = Town::where('id', $load->from_town_id)->first();
+
+        $to = Town::where('id', $load->to_town_id)->first();
+        $price = $load->price;
+        if ($searchEntity->weight_able < $load->weight) {
+            return -1000;
+        }
+        $empty1 = $this->findPath($start, $from);
+        $empty2 = $this->findPath($to, $finish);
+        $usefull = $this->findPath($from, $to);
+        echo '$usefull->distance = ' . $usefull->distance . PHP_EOL;
+        echo '$to->node_id = ' . $to->node_id . PHP_EOL;
+
+        $cost_first = $empty1->distance ;
+        $cost_second = $empty2->distance ;
+        $cost_usefull = $usefull->distance;
+        echo '$cost_first = ' . $cost_first . PHP_EOL;
+        echo '$cost_usefull = ' . $cost_usefull . PHP_EOL;
+        echo '$cost_second = ' . $cost_second . PHP_EOL;
+
+        return $price - (($cost_first + $cost_second + $cost_usefull) * 10);
     }
 
     public function findLoads(Town $from, Town $to, Load $load, int $cost_of_trip): int

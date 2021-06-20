@@ -33,8 +33,8 @@ class UtillsService implements UtillsServiceInterface
 // We have matrix 5х10 of nodes. Every node connects with neigbours at right angles
         $point_a = $from->id - 1;
         $point_b = $to->id - 1;
-        $result = abs($point_a % 10 - $point_b % 10) +
-            abs(intdiv($point_a, 10) - intdiv($point_b, 10));
+        $result = (abs($point_a % 10 - $point_b % 10) +
+            abs(intdiv($point_a, 10) - intdiv($point_b, 10))) * 50;
 //        echo '$result = ' . $result . PHP_EOL;
         return $result;
     }
