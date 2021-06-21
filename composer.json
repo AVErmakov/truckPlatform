@@ -10,6 +10,7 @@
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.40",
+        "laravel/nova": "^3.25",
         "laravel/tinker": "^2.5"
     },
     "require-dev": {
@@ -54,6 +55,12 @@
         "preferred-install": "dist",
         "sort-packages": true
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@github.com:mabalashov/laravel-nova.git"
+        }
+    ],
     "minimum-stability": "dev",
     "prefer-stable": true
 }

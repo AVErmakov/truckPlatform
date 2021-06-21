@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call([
+            UsersSeeder::class,
+        ]);
+
         // \App\Models\User::factory(10)->create();
         // Create matrix 10x5 of nodes
         $this->call(NodeTypeSeeder::class);
