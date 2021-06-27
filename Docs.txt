@@ -2,4 +2,20 @@
     or a new load in DB (for now newLoad() which generates random load).
 2. Launch the checkLoad(), in which we call findPath() for every part of trip -
     empty to pick up, usefull and empty to finish point. It returns a cost of trip
-        (if load's weight > allowable than return -1000)
+    (if load's weight > allowable than return -1000)
+    If the cost is we should generate a socket connection and send a push notification and update view
+3. We've got new offer from vehicle newOffer() (for now random value) -> we write it to DB
+    and we should send a push notification and update view
+4. Observers:
+5. Как сделать уведомления
+6. Как реализвать расчет дистанций
+7. Авторизация и права доступа
+----------
+Load:
+-from
+-to
+-date_pick_up
+-weight
+-size
+-load_type
+-vehicle_type

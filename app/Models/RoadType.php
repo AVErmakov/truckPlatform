@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class RoadType extends Model
 {
     use HasFactory;
+
+    public function road() {
+        return $this->hasMany(Road::class);
+    }
+
 }

@@ -16,6 +16,8 @@ class CreateLoadTypesTable extends Migration
         Schema::create('load_types', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('type', 64);
+            $table->timestamps();
+
         });
     }
 

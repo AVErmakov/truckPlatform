@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class NodeType extends Model
 {
     use HasFactory;
+
+    public function node() {
+        return $this->hasMany(Node::class);
+    }
+
 }

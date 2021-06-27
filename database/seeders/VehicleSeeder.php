@@ -18,17 +18,7 @@ class VehicleSeeder extends Seeder
      */
     public function run()
     {
-        $num_type = DB::table('vehicle_types')->count();
-        $num_home_location = DB::table('towns')->count();
-
-        for ($count = 1; $count <= 3; $count++) {
-            $type = random_int(1, $num_type);
-            $home = random_int(1, $num_home_location);
-            DB::table('vehicles')->insert([
-                'vehicle_type_id' => $type,
-                'home_location' => $home,
-            ]);
-        }
+        Vehicle::factory()->count(10)->create();
 
     }
 }

@@ -5,21 +5,19 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Load extends Model
+class SearchSetting extends Model
 {
     use HasFactory;
 
-//    public $timestamps = false;
-
-    public function loadType() {
-        return $this->belongsTo(LoadType::class);
+    public function vehicle() {
+        return $this->belongsTo(Vehicle::class);
     }
 
-    public function town_from() {
+    public function from_town() {
         return $this->belongsTo(Town::class, 'from_town_id');
     }
 
-    public function town_to() {
+    public function to_town() {
         return $this->belongsTo(Town::class, 'to_town_id');
     }
 

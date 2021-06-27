@@ -3,12 +3,19 @@
 namespace App\Console\Commands;
 
 use App\Contracts\LoadsServiceInterface;
+use App\Contracts\OffersServiceInterface;
+use App\Contracts\UtillsServiceInterface;
+use App\Contracts\VehiclesServiceInterface;
 use App\Entities\SearchEntity;
 use App\Models\Load;
+use App\Models\LoadType;
 use App\Models\Node;
+use App\Models\SearchSetting;
 use App\Models\Town;
+use App\Models\Vehicle;
 use App\Models\VehicleType;
 use App\Services\LoadsService;
+use Database\Factories\LoadTypeVehicleFactory;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use phpDocumentor\Reflection\Types\Collection;
@@ -45,20 +52,21 @@ class TestCommand extends Command
      * @return int
      */
     public function handle(
-        LoadsServiceInterface $loadsService
+        LoadsServiceInterface $loadsService,
+        OffersServiceInterface $offersService,
+        VehiclesServiceInterface $vehiclesService,
     )
     {
-        $start = Town::where('id', 1)->first();
-        $finish = Town::where('id', 30)->first();
+//        $loadsService->newSearchRequest(1);
 
-        $vehicleType = new VehicleType();
-        $vehicleType->type = 4;
-        $weight_able = 20;
-        $load = $loadsService->newLoad();
-        $searchEntity = $loadsService->createSearchRequest($start, $finish, $vehicleType, $weight_able);
-//        echo '$result = ' . $result->sortByDesc('benefit') . PHP_EOL;
-        $result = $loadsService->checkLoad($searchEntity, $load);
-        echo '$result =' . $result . PHP_EOL;
+//        $searchDate = new \DateTime(SearchSetting::first()->start_loading);
+//        $searchSettings = SearchSetting::first();
+//        $load = Load::where('id', 47)->first();
+//        $load = $loadsService->newLoad();
+        $vehicle = $vehiclesService->newVehicle(1);
+        echo $vehicle . PHP_EOL;
+//        dd($loadsService->checkLoad($searchSettings, $load));
+
         return 0;
     }
 }

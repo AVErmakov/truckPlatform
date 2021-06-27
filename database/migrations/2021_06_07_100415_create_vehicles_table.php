@@ -17,7 +17,7 @@ class CreateVehiclesTable extends Migration
             $table->bigIncrements('id');
             $table->unsignedBigInteger('vehicle_type_id');
             $table->unsignedBigInteger('home_location');
-
+            $table->timestamps();
             $table->foreign('vehicle_type_id')->references('id')->on('vehicle_types');
             $table->foreign('home_location')->references('id')->on('towns');
 

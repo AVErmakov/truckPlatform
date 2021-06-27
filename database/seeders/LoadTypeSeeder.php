@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\LoadType;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -14,17 +15,18 @@ class LoadTypeSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('load_types')->insert([
-            'type' => 'wood',
-        ]);
-        DB::table('load_types')->insert([
-            'type' => 'wood',
-        ]);
-        DB::table('load_types')->insert([
-            'type' => 'grocery',
-        ]);
-        DB::table('load_types')->insert([
-            'type' => 'goods',
-        ]);
+        LoadType::factory()->count(20)->create();
+//        DB::table('load_types')->insert([
+//            'type' => 'wood',
+//        ]);
+//        DB::table('load_types')->insert([
+//            'type' => 'wood',
+//        ]);
+//        DB::table('load_types')->insert([
+//            'type' => 'grocery',
+//        ]);
+//        DB::table('load_types')->insert([
+//            'type' => 'goods',
+//        ]);
     }
 }

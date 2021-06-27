@@ -12,7 +12,7 @@ class SearchEntity
 //        TODO: add time & date
         public Town $start,
         public Town $finish,
-        public VehicleType $vehicleType,
+        public Vehicle $vehicle,
         public int $weight_able,
     )
     {

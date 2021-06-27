@@ -26,5 +26,6 @@ class DatabaseSeeder extends Seeder
         $this->call(LoadTypeSeeder::class);
         $this->call(DistanceSeeder::class);
         $this->call(LoadSeeder::class);
+        $this->call(LoadTypeVehicleSeeder::class);
     }
 }

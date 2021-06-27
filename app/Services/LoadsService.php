@@ -3,23 +3,29 @@
 namespace App\Services;
 
 use App\Contracts\LoadsServiceInterface;
+use App\Contracts\UtillsServiceInterface;
+use App\Entities\LoadEntity;
 use App\Entities\PathEntity;
 use App\Entities\SearchEntity;
 use App\Models\Distance;
 use App\Models\Load;
+use App\Models\LoadType;
 use App\Models\Node;
 use App\Models\Offer;
+use App\Models\SearchSetting;
 use App\Models\Town;
 use App\Models\Vehicle;
 use App\Models\VehicleType;
 use Faker\Provider\DateTime;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class LoadsService implements LoadsServiceInterface
 {
 
-    public function findPath(Town $from, Town $to): PathEntity
+    public function findPath(Town $from, Town $to, UtillsServiceInterface $utillsService): PathEntity
     {
 //        Находим оптимальный маршрут для поездки
 //        Пока это просто расстояние из модели Distance
@@ -27,78 +33,126 @@ class LoadsService implements LoadsServiceInterface
 //        В $load будет тип груза (и в соответствии с ним надо будет выбрать
 //        тип грузовика sortByVehicleType
         // TODO: Implement type of load in Load model
-        $p1 = Node::where('id', $from->node_id)->first();
-        $p2 = Node::where('id', $to->node_id)->first();
-        $utillsService = new UtillsService();
+        $p1 = $from->node()->first();
+        $p2 = $to->node()->first();
+//        $utillsService = new UtillsService();
         $distance = $utillsService->findDistance($p1, $p2);
         $roads = collect([$p1, $p2]);
-        $pathEntity = new PathEntity($roads, $distance);
+        $pathEntity = new PathEntity(
+            $roads, $distance
+        );
         return $pathEntity;
     }
 
-    public function createSearchRequest(Town $start,
-                                        Town $finish,
-                                        VehicleType $vehicleType,
-                                        int $weight_able): SearchEntity
+    public function newSearchRequest($num): Collection
     {
-        return new SearchEntity($start, $finish, $vehicleType, $weight_able);
+        $result = SearchSetting::factory()->count($num)->create();
+
+//        dd($result);
+        return $result;
     }
 
-    public function checkLoad(SearchEntity $searchEntity, Load $load): int
+    public function checkLoadType(SearchSetting $searchSetting, Load $load): bool
     {
-        $start = $searchEntity->start;
-        $finish = $searchEntity->finish;
+        $vehicle_id = $searchSetting->vehicle_id;
+        $load_types = Vehicle::find($vehicle_id);
+        foreach ($load_types->loadType as $load_type) {
+//            echo $load->load_types_id . ' == ' . $load_type->id . PHP_EOL;
 
-        $from = Town::where('id', $load->from_town_id)->first();
+            if ($load->load_types_id == $load_type->id) {
 
-        $to = Town::where('id', $load->to_town_id)->first();
-        $price = $load->price;
-        if ($searchEntity->weight_able < $load->weight) {
-            return -1000;
+                return true;
+            };
+//            echo '$load_type->id = ' . $load_type->id . PHP_EOL;
+//            $loads_list->push($load_type);
         }
-        $empty1 = $this->findPath($start, $from);
-        $empty2 = $this->findPath($to, $finish);
-        $usefull = $this->findPath($from, $to);
-        echo '$usefull->distance = ' . $usefull->distance . PHP_EOL;
-        echo '$to->node_id = ' . $to->node_id . PHP_EOL;
-
-        $cost_first = $empty1->distance ;
-        $cost_second = $empty2->distance ;
-        $cost_usefull = $usefull->distance;
-        echo '$cost_first = ' . $cost_first . PHP_EOL;
-        echo '$cost_usefull = ' . $cost_usefull . PHP_EOL;
-        echo '$cost_second = ' . $cost_second . PHP_EOL;
-
-        return $price - (($cost_first + $cost_second + $cost_usefull) * 10);
+        return false;
     }
 
-    public function findLoads(Town $from, Town $to, Load $load, int $cost_of_trip): int
+    public function checkDatePickUp(SearchSetting $searchSetting, Load $load): bool
+//    TODO: implements calculating available interval if load_finish <= search_finish
     {
-//        Находим "эффективность" груза
-//        $from, $to - это начальные и конечные точки маршрута
-//        $cost_of_trip - параметр себестоимости
-        // TODO: Implement settings of searching
-//        (стоимость 1км пути и 1 дня работы сотрудника например)
-//        В $load есть пункты загрузки и разгрузки
-//
-        // The collection of loads
-        // TODO: Implement sortByVehicleType
+        $start_load = $load->start_loading;
 
-//        Sort requires of vehicle's type
+//     $finish_load = $load->finish_loading;
+        $start_search = $searchSetting->start_loading;
+        $finish_search = $searchSetting->finish_loading;
+        $diff_start = strtotime($start_load) - strtotime($start_search);
+        $diff_finish = strtotime($start_load) - strtotime($finish_search);
+        if ($diff_start >= 0 && $diff_finish <= 0) {
+            return true;
+        }
+        return false;
+    }
 
-        // We have distances between nodes.
-        $start = $load->from_town_id;
-        $finish = $load->to_town_id;
-        $price = $load->price;
-        $n1 = $from->id;
-        $n2 = $to->id;
-        $t1 = Distance::where('town_1_id', $n1)->where('town_2_id', $start)->first()->distance;
-        $t2 = Distance::where('town_1_id', $finish)->where('town_2_id', $n2)->first()->distance;
-        $t_main = Distance::where('town_1_id', $start)->where('town_2_id', $finish)->first()->distance;
+    public function checkProfit(SearchSetting $searchSetting, Load $load): int
+    {
+        $finish_search = $searchSetting->to_town_id;
+        $finish_load = $load->to_town_id;
+        $start_load = $load->from_town_id;
 
-//        echo '$n1 = ' . $n1 . PHP_EOL;
-//        echo '$n2 = ' . $n2 . PHP_EOL;
-        return $price - ($t1 + $t2 + $t_main) * $cost_of_trip;
+        $distance_1 = $searchSetting->from_town()->first()
+            ->distance_from()->where('town_2_id', $start_load)
+            ->first()->distance;
+        $distance_2 = $load->town_from()->first()
+            ->distance_from()->where('town_2_id', $finish_load)
+            ->first()->distance;
+        $distance_3 = $load->town_to()->first()
+            ->distance_from()->where('town_2_id', $finish_search)
+            ->first()->distance;
+
+        return $distance_1 + $distance_2 + $distance_3;
+    }
+
+    public function singleLoadSearchCheck(SearchSetting $searchSetting, Load $load): int
+    {
+        //        TODO: implement of validation of all fields checking
+
+        $type_ability = $this->checkLoadType($searchSetting, $load);
+        if (!$type_ability) return -1000;
+        $date_ability = $this->checkDatePickUp($searchSetting, $load);
+        if (!$date_ability) return -1000;
+        $profit = $this->checkProfit($searchSetting, $load);
+        if ($profit >= 0) return $profit;
+
+//        $loadsList = Load::where()
+//        foreach (Load::all() as $item) {
+//            $profit = $this->checkLoad($searchEntity, $item);
+////            echo '$profit = ' . $profit . PHP_EOL;
+//            if ($profit > 0) {
+//                $item->profit = $profit;
+////                echo '$item = ' . $item . PHP_EOL;
+//                $loads_list->push($item);
+//            }
+//        }
+//        echo '$result = ' . $loadsList . PHP_EOL;
+//        dd($loads_list);
+//        return $loads_list;
+    }
+
+    public function checkSearch(SearchSetting $searchSetting): \Illuminate\Support\Collection
+    {
+        $load_list = collect();
+        foreach (Load::all() as $load) {
+            $result = $this->singleLoadSearchCheck($searchSetting, $load);
+            if ($result >= 0) {
+                $load->profit = $result;
+                $load_list->push($load);
+            }
+        }
+        dd($load_list);
+        return $load_list;
+    }
+
+    public function checkLoad(SearchSetting $searchSetting, Load $load): \Illuminate\Support\Collection
+    {
+        $load_list = collect();
+            $result = $this->singleLoadSearchCheck($searchSetting, $load);
+            if ($result >= 0) {
+                $load->profit = $result;
+                $load_list->push($load);
+            }
+        return $load_list;
     }
 
     public function newVehicle(): Vehicle
@@ -116,55 +170,9 @@ class LoadsService implements LoadsServiceInterface
 
     public function newLoad(): Load
     {
-//  Generate load - $amount - number of loads
-//  Weight from 1 to 20 tonn
-//  Direction is random
-//  The same code is in LoadSeeder
         // TODO: Implement identify field (not increment)
-        $num = DB::table('towns')->count();
-
-        $id_town_from = random_int(1, $num);
-        $id_town_to = random_int(1, $num);
-        $distance = Distance::where('town_1_id', $id_town_from)
-            ->where('town_2_id', $id_town_to)->first()->distance;
-//            echo 'distance = ' . $distance . PHP_EOL;
-        $weight = random_int(1, 20);
-        $price = $weight * $distance + 10;
-        $load = new Load();
-        $load->weight = $weight;
-        $load->from_town_id = $id_town_from;
-        $load->to_town_id = $id_town_to;
-        $load->price = $price;
-        DB::table('loads')->insert([
-            'weight' => $load->weight,
-            'from_town_id' => $load->from_town_id,
-            'to_town_id' => $load->to_town_id,
-            'price' => $load->price,
-        ]);
-
+        $load = Load::factory()->create();
         return $load;
-    }
-
-    public function newOffer(): Offer
-    {
-        $num_load = DB::table('loads')->count();
-        $load = Load::where('id', random_int(1, $num_load))->first();
-        $num_vehicle = DB::table('vehicles')->count();
-        $vehicle = Vehicle::where('id', random_int(1, $num_vehicle))->first();
-        $now = new \DateTime();
-        $offer = new Offer();
-        $offer->load_id = $load->id;
-        $offer->vehicle_id = $vehicle->id;
-        $offer->offer_price = $load->price;
-        echo 'offer = ' . $offer . PHP_EOL;
-        DB::table('offers')->insert([
-            'load_id' => $offer->load_id,
-            'vehicle_id' => $offer->vehicle_id,
-            'offer_price' => $offer->offer_price,
-            'offer_time' => $now,
-        ]);
-
-        return $offer;
     }
 
 }

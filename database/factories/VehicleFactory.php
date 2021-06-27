@@ -3,7 +3,9 @@
 namespace Database\Factories;
 
 use App\Contracts\LoadsServiceInterface;
+use App\Models\Town;
 use App\Models\Vehicle;
+use App\Models\VehicleType;
 use App\Services\LoadsService;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,20 +27,12 @@ class VehicleFactory extends Factory
      */
     public function definition()
     {
-//        $loadsService = new LoadsService();
-//        $result = $loadsService->newVehicle();
-        $num_type = DB::table('vehicle_types')->count();
-        $num_home_location = DB::table('towns')->count();
-
-        $type = random_int(1, $num_type);
-        $home = random_int(1, $num_home_location);
-        $result = new Vehicle();
-        $result->vehicle_type_id = $num_type;
-        $result->home_location = $num_home_location;
+        $type = random_int(1, VehicleType::all()->count());
+        $home = random_int(1, Town::all()->count());
 
         return [
-            'vehicle_type_id' => $result->vehicle_type_id,
-            'home_location' => $result->home_location,
+            'vehicle_type_id' => $type,
+            'home_location' => $home,
         ];
     }
 }
